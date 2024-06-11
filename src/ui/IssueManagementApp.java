@@ -9,6 +9,8 @@ import service.IssueService;
 import model.Issue;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.util.Date;
 import java.util.List;
@@ -23,6 +25,7 @@ public class IssueManagementApp extends JFrame {
     private JTable issueTable;
     private IssueTableModel issueTableModel;
     private Long projectId;
+    private JButton historyButton;
 
     public IssueManagementApp(Long projectId) {
         this.projectId = projectId;
@@ -124,7 +127,6 @@ public class IssueManagementApp extends JFrame {
             addButton.setEnabled(false);
         }
 
-
         return inputPanel;
     }
 
@@ -137,6 +139,13 @@ public class IssueManagementApp extends JFrame {
         JScrollPane scrollPane = new JScrollPane(issueTable);
         tablePanel.add(scrollPane, BorderLayout.CENTER);
 
+        issueTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                updateHistoryButtonState();
+            }
+        });
+
         JPanel buttonPanel = new JPanel(new FlowLayout());
         JButton editButton = new JButton("Edit Issue");
         editButton.addActionListener(e -> editIssue());
@@ -146,6 +155,10 @@ public class IssueManagementApp extends JFrame {
         deleteButton.addActionListener(e -> closeIssue());
         buttonPanel.add(deleteButton);
 
+        historyButton = new JButton("View History");
+        historyButton.addActionListener(e -> viewHistory());
+        buttonPanel.add(historyButton);
+
         JButton closeButton = new JButton("Volver");
         closeButton.addActionListener(e -> closeWindow());
         buttonPanel.add(closeButton);
@@ -153,6 +166,16 @@ public class IssueManagementApp extends JFrame {
         tablePanel.add(buttonPanel, BorderLayout.SOUTH);
 
         return tablePanel;
+    }
+
+    private void viewHistory() {
+        int selectedRow = issueTable.getSelectedRow();
+        if (selectedRow >= 0) {
+            Issue selectedIssue = issueTableModel.getIssueAt(selectedRow);
+            new IssueHistoryFrame(selectedIssue.getId()).setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(this, "Please select an issue first.", "No Issue Selected", JOptionPane.WARNING_MESSAGE);
+        }
     }
 
     private void addIssue() {
@@ -261,6 +284,18 @@ public class IssueManagementApp extends JFrame {
     private void loadIssues() {
         List<Issue> issues = issueService.getIssuesByProjectId(projectId);
         issueTableModel.setIssues(issues);
+        updateHistoryButtonState();
+    }
+
+    private void updateHistoryButtonState() {
+        int selectedRow = issueTable.getSelectedRow();
+        if (selectedRow >= 0) {
+            Issue selectedIssue = issueTableModel.getIssueAt(selectedRow);
+            List<IssueHistory> history = new IssueHistoryService().getIssueHistoryByIssueId(selectedIssue.getId());
+            historyButton.setEnabled(history != null && !history.isEmpty());
+        } else {
+            historyButton.setEnabled(false);
+        }
     }
 
     // Solamente para hacer test de cómo va quedando la pantalla

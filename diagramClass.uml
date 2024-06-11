@@ -1,0 +1,319 @@
+@startuml
+
+package ui {
+
+    class LoginScreen {
+        - UserService userService
+        - JTextField usernameField
+        - JPasswordField passwordField
+        + LoginScreen()
+        - void initComponents()
+        - JPanel createMainPanel()
+        - JLabel createTitleLabel()
+        - JPanel createInputPanel()
+        - JButton createLoginButton()
+        - JLabel createFooterLabel()
+        - void login()
+        - void clearFields()
+    }
+
+
+    class UserManagementApp {
+        - UserService userService
+        - ProjectService projectService
+        - IssueService issueService
+        - JTextField usernameField
+        - JPasswordField passwordField
+        - JComboBox<String> roleComboBox
+        - JList<User> userList
+        - JTextField projectNameField
+        - JTextArea projectDescriptionArea
+        - JList<Project> projectList
+        - User currentUser
+        + UserManagementApp()
+        - JPanel createReportPanel()
+        - void addUser()
+        - void editUser()
+        - void deleteUser()
+        - void loadUsers()
+        - void addProject()
+        - void editProject()
+        - void deleteProject()
+        - void loadProjects()
+        - JPanel createUserPanel()
+        - void addUserManagementButtons(JPanel panel)
+        - void addLabelAndField(JPanel panel, GridBagConstraints gbc, String labelText, Component field, int yPosition)
+        - JPanel createProjectPanel()
+        - void addProjectManagementButtons(JPanel panel)
+        - void manageIssues()
+        - void disableNonAdminControls(JButton addProjectButton, JButton manageIssuesButton)
+        - JPanel createIssueHistoryPanel()
+        - void loadIssueHistory(JList<IssueHistory> historyList)
+    }
+
+    class IssueHistoryFrame {
+        - JList<IssueHistory> historyList
+        + IssueHistoryFrame(Long issueId)
+        - void loadIssueHistory(Long issueId, JList<IssueHistory> historyList)
+    }
+
+    class IssueManagementApp {
+        - IssueService issueService
+        - JTextField descriptionField
+        - JTextField estimatedHoursField
+        - JTextField actualHoursField
+        - JComboBox<String> statusComboBox
+        - JTable issueTable
+        - IssueTableModel issueTableModel
+        - Long projectId
+        - JButton historyButton
+        + IssueManagementApp(Long projectId)
+        - JLabel createTitleLabel()
+        - JSplitPane createSplitPane()
+        - JPanel createInputPanel()
+        - JPanel createTablePanel()
+        - void viewHistory()
+        - void addIssue()
+        - void editIssue()
+        - void closeIssue()
+        - void closeWindow()
+        - void loadIssues()
+        - void updateHistoryButtonState()
+    }
+
+    class IssueReportTableModel {
+        - List<Issue> issues
+        + IssueReportTableModel(List<Issue> issues)
+        + int getRowCount()
+        + int getColumnCount()
+        + String getColumnName(int column)
+        + Object getValueAt(int rowIndex, int columnIndex)
+        + void setIssues(List<Issue> issues)
+    }
+
+    class IssueTableModel {
+        - List<Issue> issues
+        + IssueTableModel(List<Issue> issues)
+        + int getRowCount()
+        + int getColumnCount()
+        + String getColumnName(int column)
+        + Object getValueAt(int rowIndex, int columnIndex)
+        + Issue getIssueAt(int rowIndex)
+        + void setIssues(List<Issue> issues)
+    }
+
+    class ProjectReportTableModel {
+        - List<ProjectReport> reports
+        + ProjectReportTableModel(List<ProjectReport> reports)
+        + int getRowCount()
+        + int getColumnCount()
+        + String getColumnName(int column)
+        + Object getValueAt(int rowIndex, int columnIndex)
+        + void setReports(List<ProjectReport> reports)
+    }
+
+    class ReportPanel {
+        - ReportService reportService
+        - JTable reportTable
+        - ProjectReportTableModel tableModel
+        + ReportPanel()
+        + void loadReportData()
+        + void downloadReport()
+    }
+
+    class StatusCellRenderer {
+        + Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
+    }
+
+}
+
+package model {
+
+    class UserContext {
+        - static UserContext instance
+        - User currentUser
+        + static UserContext getInstance()
+        + User getCurrentUser()
+        + void setCurrentUser(User currentUser)
+    }
+
+        class User {
+        - Long id
+        - String username
+        - String password
+        - String role
+        + Long getId()
+        + void setId(Long id)
+        + String getUsername()
+        + void setUsername(String username)
+        + String getPassword()
+        + void setPassword(String password)
+        + String getRole()
+        + void setRole(String role)
+        + String toString()
+    }
+
+
+    class Project {
+        - Long id
+        - String name
+        - String description
+        + Long getId()
+        + void setId(Long id)
+        + String getName()
+        + void setName(String name)
+        + String getDescription()
+        + void setDescription(String description)
+        + String toString()
+    }
+
+    class Issue {
+        - Long id
+        - Long projectId
+        - String description
+        - double estimatedHours
+        - double actualHours
+        - String status
+        + Long getId()
+        + void setId(Long id)
+        + Long getProjectId()
+        + void setProjectId(Long projectId)
+        + String getDescription()
+        + void setDescription(String description)
+        + double getEstimatedHours()
+        + void setEstimatedHours(double estimatedHours)
+        + double getActualHours()
+        + void setActualHours(double actualHours)
+        + String getStatus()
+        + void setStatus(String status)
+    }
+
+    class ProjectReport {
+        - String projectName
+        - double estimatedHours
+        - double actualHours
+        + String getProjectName()
+        + void setProjectName(String projectName)
+        + double getEstimatedHours()
+        + void setEstimatedHours(double estimatedHours)
+        + double getActualHours()
+        + void setActualHours(double actualHours)
+    }
+
+
+
+
+    class IssueHistory {
+        - Long id
+        - Long issueId
+        - String username
+        - Date date
+        - String infoBefore
+        - String infoAfter
+        + Long getId()
+        + void setId(Long id)
+        + Long getIssueId()
+        + void setIssueId(Long issueId)
+        + String getUsername()
+        + void setUsername(String username)
+        + Date getDate()
+        + void setDate(Date date)
+        + String getInfoBefore()
+        + void setInfoBefore(String infoBefore)
+        + String getInfoAfter()
+        + void setInfoAfter(String infoAfter)
+    }
+
+    class DownloadFile {
+        - String projectName
+        - String description
+        - long countIssues
+        - double actualHours
+        - String status
+        + String getProjectName()
+        + void setProjectName(String projectName)
+        + String getDescription()
+        + void setDescription(String description)
+        + long getCountIssues()
+        + void setCountIssues(long countIssues)
+        + double getActualHours()
+        + void setActualHours(double actualHours)
+        + String getStatus()
+        + void setStatus(String status)
+    }
+
+}
+
+package service {
+    class IssueHistoryService {
+        + void createIssueHistory(IssueHistory history)
+        + List<IssueHistory> getIssueHistoryByIssueId(Long issueId)
+        + List<IssueHistory> getAllIssueHistories()
+    }
+
+    class IssueService {
+        + List<Issue> getAllIssues()
+        + void deleteIssuesByProjectId(Long projectId)
+        + List<Issue> getIssuesByProjectId(Long projectId)
+        + void createIssue(Issue issue)
+        + void updateIssue(Issue issue)
+        + void deleteIssue(Long issueId)
+        + void closeIssue(Long issueId)
+    }
+
+    class ProjectService {
+        + List<Project> getAllProjects()
+        + void createProject(Project project)
+        + void updateProject(Project project)
+        + void deleteProject(Long projectId)
+    }
+
+    class ReportService {
+        + List<ProjectReport> getProjectReports()
+        + List<DownloadFile> getDownloadFileData()
+    }
+
+    class UserService {
+        + List<User> getAllUsers()
+        + void createUser(User user)
+        + void updateUser(User user)
+        + void deleteUser(Long userId)
+        + User getUserByUsernameAndPassword(String username, String password)
+    }
+}
+
+package database {
+    class DatabaseManager {
+        + static Connection getConnection() throws SQLException
+        + static void createTables()
+    }
+}
+
+Main --> LoginScreen : starts
+
+UserContext --> User : has
+Issue --> Project : belongs to
+IssueHistory --> Issue : relates to
+ProjectReport --> Project : reports on
+IssueHistoryService --> IssueHistory
+IssueService --> Issue
+ProjectService --> Project
+ReportService --> ProjectReport
+UserService --> User
+DatabaseManager ..> Connection : uses
+DatabaseManager ..> DriverManager : uses
+IssueHistoryFrame --> IssueHistoryService : uses
+IssueManagementApp --> IssueService : uses
+IssueManagementApp --> IssueTableModel : uses
+IssueManagementApp --> IssueHistoryFrame : uses
+LoginScreen --> UserService : uses
+ProjectReportTableModel --> ProjectReport : uses
+ReportPanel --> ReportService : uses
+ReportPanel --> ProjectReportTableModel : uses
+StatusCellRenderer ..> DefaultTableCellRenderer : extends
+UserManagementApp --> UserService : uses
+UserManagementApp --> ProjectService : uses
+UserManagementApp --> IssueService : uses
+
+@enduml
+

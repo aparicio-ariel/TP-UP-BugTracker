@@ -23,7 +23,7 @@ public class LoginScreen extends JFrame {
 
     public LoginScreen() {
         userService = new UserService();
-        setTitle("Login");
+        setTitle("Inicio de Sesión");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -61,7 +61,7 @@ public class LoginScreen extends JFrame {
     }
 
     private JLabel createTitleLabel() {
-        JLabel titleLabel = new JLabel("Issue Tracker Login");
+        JLabel titleLabel = new JLabel("Inicio de Sesión del Rastreador de Incidentes");
         titleLabel.setFont(TITLE_FONT);
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         return titleLabel;
@@ -77,7 +77,7 @@ public class LoginScreen extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.EAST;
-        inputPanel.add(new JLabel("Username:"), gbc);
+        inputPanel.add(new JLabel("Nombre de Usuario:"), gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 0;
@@ -88,7 +88,7 @@ public class LoginScreen extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.anchor = GridBagConstraints.EAST;
-        inputPanel.add(new JLabel("Password:"), gbc);
+        inputPanel.add(new JLabel("Contraseña:"), gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 1;
@@ -100,14 +100,14 @@ public class LoginScreen extends JFrame {
     }
 
     private JButton createLoginButton() {
-        JButton loginButton = new JButton("Login");
+        JButton loginButton = new JButton("Iniciar Sesión");
         loginButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         loginButton.addActionListener(e -> login());
         return loginButton;
     }
 
     private JLabel createFooterLabel() {
-        JLabel footerLabel = new JLabel("© 2024 Issue Tracker");
+        JLabel footerLabel = new JLabel("© 2024 Rastreador de Incidentes");
         footerLabel.setFont(FOOTER_FONT);
         footerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         return footerLabel;
@@ -118,7 +118,7 @@ public class LoginScreen extends JFrame {
         String password = new String(passwordField.getPassword()).trim();
 
         if (username.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Username and password fields cannot be empty.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Los campos de nombre de usuario y contraseña no pueden estar vacíos.", "Error de Entrada", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -128,7 +128,7 @@ public class LoginScreen extends JFrame {
             new UserManagementApp().setVisible(true);
             dispose();
         } else {
-            JOptionPane.showMessageDialog(this, "Invalid username or password", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Nombre de usuario o contraseña incorrectos", "Error", JOptionPane.ERROR_MESSAGE);
             clearFields();
         }
     }

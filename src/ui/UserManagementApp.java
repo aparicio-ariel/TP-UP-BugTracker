@@ -11,6 +11,8 @@ import model.User;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.List;
 
 public class UserManagementApp extends JFrame {
 
@@ -55,22 +57,23 @@ public class UserManagementApp extends JFrame {
     private JPanel createReportPanel() {
         return new ReportPanel();
     }
+
     private void addUser() {
+        String username = usernameField.getText().trim();
+        String password = new String(passwordField.getPassword()).trim();
+        String role = (String) roleComboBox.getSelectedItem();
+
+        if (username.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Username and password fields cannot be empty.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(password);
+        user.setRole(role);
+
         try {
-            String username = usernameField.getText().trim();
-            String password = new String(passwordField.getPassword()).trim();
-            String role = (String) roleComboBox.getSelectedItem();
-
-            if (username.isEmpty() || password.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Username and password fields cannot be empty.", "Input Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            User user = new User();
-            user.setUsername(username);
-            user.setPassword(password);
-            user.setRole(role);
-
             userService.createUser(user);
             loadUsers();
         } catch (Exception e) {
@@ -81,9 +84,6 @@ public class UserManagementApp extends JFrame {
             }
         }
     }
-
-
-
 
     private void editUser() {
         User selectedUser = userList.getSelectedValue();
@@ -99,19 +99,16 @@ public class UserManagementApp extends JFrame {
                         JOptionPane.QUESTION_MESSAGE, null, new String[]{"admin", "reporter", "status_change", "time_tracker", "closer"}, selectedUser.getRole());
                 if (role == null) return; // Abort if Cancel is pressed
 
-                if (username != null && password != null && role != null) {
-                    selectedUser.setUsername(username);
-                    selectedUser.setPassword(password);
-                    selectedUser.setRole(role);
-                    userService.updateUser(selectedUser);
-                    loadUsers();
-                }
+                selectedUser.setUsername(username);
+                selectedUser.setPassword(password);
+                selectedUser.setRole(role);
+                userService.updateUser(selectedUser);
+                loadUsers();
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, "An error occurred while editing the user: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
-
 
     private void deleteUser() {
         User selectedUser = userList.getSelectedValue();
@@ -128,10 +125,9 @@ public class UserManagementApp extends JFrame {
         }
     }
 
-
     private void loadUsers() {
         if (currentUser.getRole().equals("admin")) {
-            java.util.List<User> users = userService.getAllUsers();
+            List<User> users = userService.getAllUsers();
             DefaultListModel<User> model = new DefaultListModel<>();
             for (User user : users) {
                 model.addElement(user);
@@ -146,14 +142,19 @@ public class UserManagementApp extends JFrame {
             return;
         }
 
+        String name = projectNameField.getText().trim();
+        String description = projectDescriptionArea.getText().trim();
+
+        if (name.isEmpty() || description.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Project name and description cannot be empty.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        Project project = new Project();
+        project.setName(name);
+        project.setDescription(description);
+
         try {
-            String name = projectNameField.getText();
-            String description = projectDescriptionArea.getText();
-
-            Project project = new Project();
-            project.setName(name);
-            project.setDescription(description);
-
             projectService.createProject(project);
             loadProjects();
         } catch (Exception e) {
@@ -161,27 +162,25 @@ public class UserManagementApp extends JFrame {
         }
     }
 
-
-
     private void editProject() {
         Project selectedProject = projectList.getSelectedValue();
         if (selectedProject != null) {
             try {
                 String name = JOptionPane.showInputDialog(this, "Enter new project name:", selectedProject.getName());
-                String description = JOptionPane.showInputDialog(this, "Enter new project description:", selectedProject.getDescription());
+                if (name == null) return; // Abort if Cancel is pressed
 
-                if (name != null && description != null) {
-                    selectedProject.setName(name);
-                    selectedProject.setDescription(description);
-                    projectService.updateProject(selectedProject);
-                    loadProjects();
-                }
+                String description = JOptionPane.showInputDialog(this, "Enter new project description:", selectedProject.getDescription());
+                if (description == null) return; // Abort if Cancel is pressed
+
+                selectedProject.setName(name);
+                selectedProject.setDescription(description);
+                projectService.updateProject(selectedProject);
+                loadProjects();
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, "An error occurred while editing the project: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
-
 
     private void deleteProject() {
         Project selectedProject = projectList.getSelectedValue();
@@ -199,9 +198,8 @@ public class UserManagementApp extends JFrame {
         }
     }
 
-
     private void loadProjects() {
-        java.util.List<Project> projects = projectService.getAllProjects();
+        List<Project> projects = projectService.getAllProjects();
         DefaultListModel<Project> model = new DefaultListModel<>();
         for (Project project : projects) {
             model.addElement(project);
@@ -216,38 +214,9 @@ public class UserManagementApp extends JFrame {
         GridBagConstraints gbcUser = new GridBagConstraints();
         gbcUser.insets = new Insets(10, 10, 10, 10);
 
-        gbcUser.gridx = 0;
-        gbcUser.gridy = 0;
-        gbcUser.anchor = GridBagConstraints.EAST;
-        userPanel.add(new JLabel("Username:"), gbcUser);
-
-        gbcUser.gridx = 1;
-        gbcUser.gridy = 0;
-        gbcUser.anchor = GridBagConstraints.WEST;
-        usernameField = new JTextField(20);
-        userPanel.add(usernameField, gbcUser);
-
-        gbcUser.gridx = 0;
-        gbcUser.gridy = 1;
-        gbcUser.anchor = GridBagConstraints.EAST;
-        userPanel.add(new JLabel("Password:"), gbcUser);
-
-        gbcUser.gridx = 1;
-        gbcUser.gridy = 1;
-        gbcUser.anchor = GridBagConstraints.WEST;
-        passwordField = new JPasswordField(20);
-        userPanel.add(passwordField, gbcUser);
-
-        gbcUser.gridx = 0;
-        gbcUser.gridy = 2;
-        gbcUser.anchor = GridBagConstraints.EAST;
-        userPanel.add(new JLabel("Role:"), gbcUser);
-
-        gbcUser.gridx = 1;
-        gbcUser.gridy = 2;
-        gbcUser.anchor = GridBagConstraints.WEST;
-        roleComboBox = new JComboBox<>(new String[]{"admin", "REPORTER", "STATUS_CHANGER", "TIME_TRACKER", "CLOSER"});
-        userPanel.add(roleComboBox, gbcUser);
+        addLabelAndField(userPanel, gbcUser, "Username:", usernameField = new JTextField(20), 0);
+        addLabelAndField(userPanel, gbcUser, "Password:", passwordField = new JPasswordField(20), 1);
+        addLabelAndField(userPanel, gbcUser, "Role:", roleComboBox = new JComboBox<>(new String[]{"admin", "REPORTER", "STATUS_CHANGER", "TIME_TRACKER", "CLOSER"}), 2);
 
         gbcUser.gridx = 1;
         gbcUser.gridy = 3;
@@ -269,19 +238,33 @@ public class UserManagementApp extends JFrame {
         userListPanel.add(userScrollPane, BorderLayout.CENTER);
 
         JPanel userButtonPanel = new JPanel(new FlowLayout());
-        JButton editUserButton = new JButton("Edit User");
-        editUserButton.addActionListener(e -> editUser());
-        userButtonPanel.add(editUserButton);
-
-        JButton deleteUserButton = new JButton("Delete User");
-        deleteUserButton.addActionListener(e -> deleteUser());
-        userButtonPanel.add(deleteUserButton);
-
+        addUserManagementButtons(userButtonPanel);
         userListPanel.add(userButtonPanel, BorderLayout.SOUTH);
 
         return userPanel;
     }
 
+    private void addUserManagementButtons(JPanel panel) {
+        JButton editUserButton = new JButton("Edit User");
+        editUserButton.addActionListener(e -> editUser());
+        panel.add(editUserButton);
+
+        JButton deleteUserButton = new JButton("Delete User");
+        deleteUserButton.addActionListener(e -> deleteUser());
+        panel.add(deleteUserButton);
+    }
+
+    private void addLabelAndField(JPanel panel, GridBagConstraints gbc, String labelText, Component field, int yPosition) {
+        gbc.gridx = 0;
+        gbc.gridy = yPosition;
+        gbc.anchor = GridBagConstraints.EAST;
+        panel.add(new JLabel(labelText), gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = yPosition;
+        gbc.anchor = GridBagConstraints.WEST;
+        panel.add(field, gbc);
+    }
 
     private JPanel createProjectPanel() {
         JPanel projectPanel = new JPanel(new GridBagLayout());
@@ -290,27 +273,8 @@ public class UserManagementApp extends JFrame {
         GridBagConstraints gbcProject = new GridBagConstraints();
         gbcProject.insets = new Insets(10, 10, 10, 10);
 
-        gbcProject.gridx = 0;
-        gbcProject.gridy = 0;
-        gbcProject.anchor = GridBagConstraints.EAST;
-        projectPanel.add(new JLabel("Project Name:"), gbcProject);
-
-        gbcProject.gridx = 1;
-        gbcProject.gridy = 0;
-        gbcProject.anchor = GridBagConstraints.WEST;
-        projectNameField = new JTextField(20);
-        projectPanel.add(projectNameField, gbcProject);
-
-        gbcProject.gridx = 0;
-        gbcProject.gridy = 1;
-        gbcProject.anchor = GridBagConstraints.EAST;
-        projectPanel.add(new JLabel("Description:"), gbcProject);
-
-        gbcProject.gridx = 1;
-        gbcProject.gridy = 1;
-        gbcProject.anchor = GridBagConstraints.WEST;
-        projectDescriptionArea = new JTextArea(5, 20);
-        projectPanel.add(new JScrollPane(projectDescriptionArea), gbcProject);
+        addLabelAndField(projectPanel, gbcProject, "Project Name:", projectNameField = new JTextField(20), 0);
+        addLabelAndField(projectPanel, gbcProject, "Description:", projectDescriptionArea = new JTextArea(5, 20), 1);
 
         gbcProject.gridx = 1;
         gbcProject.gridy = 2;
@@ -332,38 +296,45 @@ public class UserManagementApp extends JFrame {
         projectListPanel.add(projectScrollPane, BorderLayout.CENTER);
 
         JPanel projectButtonPanel = new JPanel(new FlowLayout());
-        JButton editProjectButton = new JButton("Edit Project");
-        editProjectButton.addActionListener(e -> editProject());
-        projectButtonPanel.add(editProjectButton);
-
-        JButton deleteProjectButton = new JButton("Delete Project");
-        deleteProjectButton.addActionListener(e -> deleteProject());
-        projectButtonPanel.add(deleteProjectButton);
-
+        addProjectManagementButtons(projectButtonPanel);
         projectListPanel.add(projectButtonPanel, BorderLayout.SOUTH);
 
         JButton manageIssuesButton = new JButton("Manage Issues");
-        manageIssuesButton.addActionListener(e -> {
-            Project selectedProject = projectList.getSelectedValue();
-            if (selectedProject != null) {
-                new IssueManagementApp(selectedProject.getId()).setVisible(true);
-            } else {
-                JOptionPane.showMessageDialog(this, "Please select a project first.", "No Project Selected", JOptionPane.WARNING_MESSAGE);
-            }
-        });
+        manageIssuesButton.addActionListener(e -> manageIssues());
         gbcProject.gridy = 4;
         projectPanel.add(manageIssuesButton, gbcProject);
 
-        // Deshabilitar los botones si el usuario no es admin
+        disableNonAdminControls(addProjectButton, manageIssuesButton);
+
+        return projectPanel;
+    }
+
+    private void addProjectManagementButtons(JPanel panel) {
+        JButton editProjectButton = new JButton("Edit Project");
+        editProjectButton.addActionListener(e -> editProject());
+        panel.add(editProjectButton);
+
+        JButton deleteProjectButton = new JButton("Delete Project");
+        deleteProjectButton.addActionListener(e -> deleteProject());
+        panel.add(deleteProjectButton);
+    }
+
+    private void manageIssues() {
+        Project selectedProject = projectList.getSelectedValue();
+        if (selectedProject != null) {
+            new IssueManagementApp(selectedProject.getId()).setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(this, "Please select a project first.", "No Project Selected", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void disableNonAdminControls(JButton addProjectButton, JButton manageIssuesButton) {
         if (!currentUser.getRole().equals("admin")) {
             addProjectButton.setEnabled(false);
-            editProjectButton.setEnabled(false);
-            deleteProjectButton.setEnabled(false);
+            manageIssuesButton.setEnabled(false);
             projectNameField.setEnabled(false);
             projectDescriptionArea.setEnabled(false);
         }
-
-        return projectPanel;
     }
 
     private JPanel createIssueHistoryPanel() {
@@ -375,16 +346,19 @@ public class UserManagementApp extends JFrame {
         JScrollPane historyScrollPane = new JScrollPane(historyList);
         historyPanel.add(historyScrollPane, BorderLayout.CENTER);
 
-        // Cargar el historial de todos los issues
+        loadIssueHistory(historyList);
+
+        return historyPanel;
+    }
+
+    private void loadIssueHistory(JList<IssueHistory> historyList) {
         IssueHistoryService issueHistoryService = new IssueHistoryService();
-        java.util.List<IssueHistory> histories = issueHistoryService.getAllIssueHistories();
+        List<IssueHistory> histories = issueHistoryService.getAllIssueHistories();
         DefaultListModel<IssueHistory> model = new DefaultListModel<>();
         for (IssueHistory history : histories) {
             model.addElement(history);
         }
         historyList.setModel(model);
-
-        // Agregar un renderer para mostrar el historial de una manera legible
         historyList.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -394,13 +368,10 @@ public class UserManagementApp extends JFrame {
                     setText("<html><b>User:</b> " + history.getUsername() +
                             "<br><b>Date:</b> " + history.getDate() +
                             "<br><b>Before:</b> " + history.getInfoBefore() +
-                            "<br><b/>After:</b> " + history.getInfoAfter() + "<hr></html>");
+                            "<br><b>After:</b> " + history.getInfoAfter() + "<hr></html>");
                 }
                 return this;
             }
         });
-
-        return historyPanel;
     }
-
 }
