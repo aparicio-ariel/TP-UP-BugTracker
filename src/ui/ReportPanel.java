@@ -20,7 +20,7 @@ public class ReportPanel extends JPanel {
     public ReportPanel() {
         reportService = new ReportService();
         setLayout(new BorderLayout());
-        setBorder(BorderFactory.createTitledBorder("Project Report"));
+        setBorder(BorderFactory.createTitledBorder("Reporte de Proyectos"));
 
         tableModel = new ProjectReportTableModel(List.of());
         reportTable = new JTable(tableModel);
@@ -30,7 +30,7 @@ public class ReportPanel extends JPanel {
 
         JPanel bottomPanel = new JPanel(new FlowLayout());
 
-        JButton refreshButton = new JButton("Refresh");
+        JButton refreshButton = new JButton("Actualizar");
         refreshButton.addActionListener(e -> loadReportData());
         bottomPanel.add(refreshButton);
 
@@ -55,7 +55,7 @@ public class ReportPanel extends JPanel {
         List<DownloadFile> downloadFiles = reportService.getDownloadFileData();
 
         try (FileWriter writer = new FileWriter("project_report.csv")) {
-            writer.append("Project Name, Description, Issue Count, Actual Hours, Status\n");
+            writer.append("Nombre del Proyecto, Descripción, Número de Incidentes, Horas Reales, Estado\n");
             for (DownloadFile df : downloadFiles) {
                 writer.append(df.getProjectName())
                         .append(", ")

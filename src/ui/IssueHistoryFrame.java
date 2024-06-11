@@ -10,7 +10,7 @@ import java.util.List;
 public class IssueHistoryFrame extends JFrame {
 
     public IssueHistoryFrame(Long issueId) {
-        setTitle("Issue History");
+        setTitle("Historial del Incidente");
         setSize(600, 400);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -37,10 +37,10 @@ public class IssueHistoryFrame extends JFrame {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof IssueHistory) {
                     IssueHistory history = (IssueHistory) value;
-                    setText("<html><b>User:</b> " + history.getUsername() +
-                            "<br><b>Date:</b> " + history.getDate() +
-                            "<br><b>Before:</b> " + history.getInfoBefore() +
-                            "<br><b>After:</b> " + history.getInfoAfter() + "<hr></html>");
+                    setText("<html><b>Usuario:</b> " + history.getUsername() +
+                            "<br><b>Fecha:</b> " + history.getDate() +
+                            "<br><b>Antes:</b> " + history.getInfoBefore() +
+                            "<br><b>Después:</b> " + history.getInfoAfter() + "<hr></html>");
                 }
                 return this;
             }

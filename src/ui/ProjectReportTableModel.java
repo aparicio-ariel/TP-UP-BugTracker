@@ -7,7 +7,7 @@ import java.util.List;
 
 public class ProjectReportTableModel extends AbstractTableModel {
 
-    private final String[] columnNames = {"Project Name", "Estimated Hours", "Actual Hours", "Status"};
+    private final String[] columnNames = {"Nombre del Proyecto", "Horas Estimadas", "Horas Reales", "Estado"};
     private List<ProjectReport> reports;
 
     public ProjectReportTableModel(List<ProjectReport> reports) {

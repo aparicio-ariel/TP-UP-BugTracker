@@ -31,7 +31,7 @@ public class IssueManagementApp extends JFrame {
         this.projectId = projectId;
         issueService = new IssueService();
 
-        setTitle("Issue Management");
+        setTitle("Gestión de Incidentes");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -44,7 +44,7 @@ public class IssueManagementApp extends JFrame {
     }
 
     private JLabel createTitleLabel() {
-        JLabel titleLabel = new JLabel("Issue Management");
+        JLabel titleLabel = new JLabel("Gestión de Incidentes");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         return titleLabel;
@@ -60,7 +60,7 @@ public class IssueManagementApp extends JFrame {
 
     private JPanel createInputPanel() {
         JPanel inputPanel = new JPanel(new GridBagLayout());
-        inputPanel.setBorder(BorderFactory.createTitledBorder("Issue Information"));
+        inputPanel.setBorder(BorderFactory.createTitledBorder("Información del Incidente"));
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
@@ -70,7 +70,7 @@ public class IssueManagementApp extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.EAST;
-        inputPanel.add(new JLabel("Description:"), gbc);
+        inputPanel.add(new JLabel("Descripción:"), gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 0;
@@ -81,7 +81,7 @@ public class IssueManagementApp extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.anchor = GridBagConstraints.EAST;
-        inputPanel.add(new JLabel("Estimated Hours:"), gbc);
+        inputPanel.add(new JLabel("Horas Estimadas:"), gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 1;
@@ -92,7 +92,7 @@ public class IssueManagementApp extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.anchor = GridBagConstraints.EAST;
-        inputPanel.add(new JLabel("Actual Hours:"), gbc);
+        inputPanel.add(new JLabel("Horas Reales:"), gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 2;
@@ -103,18 +103,18 @@ public class IssueManagementApp extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.anchor = GridBagConstraints.EAST;
-        inputPanel.add(new JLabel("Status:"), gbc);
+        inputPanel.add(new JLabel("Estado:"), gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 3;
         gbc.anchor = GridBagConstraints.WEST;
-        statusComboBox = new JComboBox<>(new String[]{"Open", "In Progress", "Closed"});
+        statusComboBox = new JComboBox<>(new String[]{"Abierto", "En Progreso", "Cerrado"});
         inputPanel.add(statusComboBox, gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 4;
         gbc.anchor = GridBagConstraints.CENTER;
-        JButton addButton = new JButton("Add Issue");
+        JButton addButton = new JButton("Agregar Incidente");
         addButton.addActionListener(e -> addIssue());
         inputPanel.add(addButton, gbc);
 
@@ -132,7 +132,7 @@ public class IssueManagementApp extends JFrame {
 
     private JPanel createTablePanel() {
         JPanel tablePanel = new JPanel(new BorderLayout());
-        tablePanel.setBorder(BorderFactory.createTitledBorder("Issue List"));
+        tablePanel.setBorder(BorderFactory.createTitledBorder("Lista de Incidentes"));
 
         issueTableModel = new IssueTableModel(issueService.getIssuesByProjectId(projectId));
         issueTable = new JTable(issueTableModel);
@@ -147,15 +147,15 @@ public class IssueManagementApp extends JFrame {
         });
 
         JPanel buttonPanel = new JPanel(new FlowLayout());
-        JButton editButton = new JButton("Edit Issue");
+        JButton editButton = new JButton("Editar Incidente");
         editButton.addActionListener(e -> editIssue());
         buttonPanel.add(editButton);
 
-        JButton deleteButton = new JButton("Close Issue");
+        JButton deleteButton = new JButton("Cerrar Incidente");
         deleteButton.addActionListener(e -> closeIssue());
         buttonPanel.add(deleteButton);
 
-        historyButton = new JButton("View History");
+        historyButton = new JButton("Ver Historial");
         historyButton.addActionListener(e -> viewHistory());
         buttonPanel.add(historyButton);
 
@@ -174,7 +174,7 @@ public class IssueManagementApp extends JFrame {
             Issue selectedIssue = issueTableModel.getIssueAt(selectedRow);
             new IssueHistoryFrame(selectedIssue.getId()).setVisible(true);
         } else {
-            JOptionPane.showMessageDialog(this, "Please select an issue first.", "No Issue Selected", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Por favor seleccione un incidente primero.", "No se Seleccionó Incidente", JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -186,7 +186,7 @@ public class IssueManagementApp extends JFrame {
             String status = (String) statusComboBox.getSelectedItem();
 
             Issue issue = new Issue();
-            issue.setProjectId(projectId); // Set project ID
+            issue.setProjectId(projectId); // Establecer ID del proyecto
             issue.setDescription(description);
             issue.setEstimatedHours(estimatedHours);
             issue.setActualHours(actualHours);
@@ -195,9 +195,9 @@ public class IssueManagementApp extends JFrame {
             issueService.createIssue(issue);
             loadIssues();
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Please enter valid numbers for estimated and actual hours.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Por favor ingrese números válidos para las horas estimadas y reales.", "Error de Entrada", JOptionPane.ERROR_MESSAGE);
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "An error occurred while adding the issue: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Ocurrió un error al agregar el incidente: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -205,7 +205,7 @@ public class IssueManagementApp extends JFrame {
         int selectedRow = issueTable.getSelectedRow();
         if (selectedRow >= 0) {
             Issue selectedIssue = issueTableModel.getIssueAt(selectedRow);
-            Issue oldIssue = new Issue(); // Crear una copia del issue anterior
+            Issue oldIssue = new Issue(); // Crear una copia del incidente anterior
             oldIssue.setDescription(selectedIssue.getDescription());
             oldIssue.setEstimatedHours(selectedIssue.getEstimatedHours());
             oldIssue.setActualHours(selectedIssue.getActualHours());
@@ -220,21 +220,21 @@ public class IssueManagementApp extends JFrame {
                 String status = selectedIssue.getStatus();
 
                 if (currentUser.getRole().equals("admin") || currentUser.getRole().equals("reporter")) {
-                    String newDescription = JOptionPane.showInputDialog(this, "Enter new description:", selectedIssue.getDescription());
+                    String newDescription = JOptionPane.showInputDialog(this, "Ingrese la nueva descripción:", selectedIssue.getDescription());
                     if (newDescription == null) return; // Abort if Cancel is pressed
                     description = newDescription;
                 }
                 if (currentUser.getRole().equals("admin") || currentUser.getRole().equals("status_changer")) {
-                    String newStatus = (String) JOptionPane.showInputDialog(this, "Select new status:", "Status", JOptionPane.QUESTION_MESSAGE, null, new String[]{"Open", "In Progress", "Closed"}, selectedIssue.getStatus());
+                    String newStatus = (String) JOptionPane.showInputDialog(this, "Seleccione el nuevo estado:", "Estado", JOptionPane.QUESTION_MESSAGE, null, new String[]{"Abierto", "En Progreso", "Cerrado"}, selectedIssue.getStatus());
                     if (newStatus == null) return; // Abort if Cancel is pressed
                     status = newStatus;
                 }
                 if (currentUser.getRole().equals("admin") || currentUser.getRole().equals("time_tracker")) {
-                    String newEstimatedHours = JOptionPane.showInputDialog(this, "Enter new estimated hours:", selectedIssue.getEstimatedHours());
+                    String newEstimatedHours = JOptionPane.showInputDialog(this, "Ingrese las nuevas horas estimadas:", selectedIssue.getEstimatedHours());
                     if (newEstimatedHours == null) return; // Abort if Cancel is pressed
                     estimatedHours = Double.parseDouble(newEstimatedHours);
 
-                    String newActualHours = JOptionPane.showInputDialog(this, "Enter new actual hours:", selectedIssue.getActualHours());
+                    String newActualHours = JOptionPane.showInputDialog(this, "Ingrese las nuevas horas reales:", selectedIssue.getActualHours());
                     if (newActualHours == null) return; // Abort if Cancel is pressed
                     actualHours = Double.parseDouble(newActualHours);
                 }
@@ -251,16 +251,16 @@ public class IssueManagementApp extends JFrame {
                 history.setIssueId(selectedIssue.getId());
                 history.setUsername(currentUser.getUsername());
                 history.setDate(new Date());
-                history.setInfoBefore("Description: " + oldIssue.getDescription() + ", Estimated Hours: " + oldIssue.getEstimatedHours() + ", Actual Hours: " + oldIssue.getActualHours() + ", Status: " + oldIssue.getStatus());
-                history.setInfoAfter("Description: " + selectedIssue.getDescription() + ", Estimated Hours: " + selectedIssue.getEstimatedHours() + ", Actual Hours: " + selectedIssue.getActualHours() + ", Status: " + selectedIssue.getStatus());
+                history.setInfoBefore("Descripción: " + oldIssue.getDescription() + ", Horas Estimadas: " + oldIssue.getEstimatedHours() + ", Horas Reales: " + oldIssue.getActualHours() + ", Estado: " + oldIssue.getStatus());
+                history.setInfoAfter("Descripción: " + selectedIssue.getDescription() + ", Horas Estimadas: " + selectedIssue.getEstimatedHours() + ", Horas Reales: " + selectedIssue.getActualHours() + ", Estado: " + selectedIssue.getStatus());
 
                 new IssueHistoryService().createIssueHistory(history);
 
                 loadIssues();
             } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(this, "Please enter valid numbers for estimated and actual hours.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Por favor ingrese números válidos para las horas estimadas y reales.", "Error de Entrada", JOptionPane.ERROR_MESSAGE);
             } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, "An error occurred while editing the issue: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Ocurrió un error al editar el incidente: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
@@ -269,7 +269,7 @@ public class IssueManagementApp extends JFrame {
         int selectedRow = issueTable.getSelectedRow();
         if (selectedRow >= 0) {
             Issue selectedIssue = issueTableModel.getIssueAt(selectedRow);
-            int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to close this issue?", "Confirm close", JOptionPane.YES_NO_OPTION);
+            int confirm = JOptionPane.showConfirmDialog(this, "¿Está seguro de que desea cerrar este incidente?", "Confirmar cierre", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
                 issueService.closeIssue(selectedIssue.getId());
                 loadIssues();

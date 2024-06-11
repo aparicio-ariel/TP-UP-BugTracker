@@ -7,7 +7,7 @@ import java.util.List;
 
 public class IssueReportTableModel extends AbstractTableModel {
 
-    private final String[] columnNames = {"Description", "Estimated Hours", "Actual Hours", "Status"};
+    private final String[] columnNames = {"Descripción", "Horas Estimadas", "Horas Reales", "Estado"};
     private List<Issue> issues;
 
     public IssueReportTableModel(List<Issue> issues) {

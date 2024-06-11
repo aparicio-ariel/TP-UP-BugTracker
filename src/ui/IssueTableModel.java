@@ -6,7 +6,7 @@ import javax.swing.table.AbstractTableModel;
 import java.util.List;
 
 public class IssueTableModel extends AbstractTableModel {
-    private final String[] columnNames = {"Description", "Estimated Hours", "Actual Hours", "Status"};
+    private final String[] columnNames = {"Descripción", "Horas Estimadas", "Horas Reales", "Estado"};
     private List<Issue> issues;
 
     public IssueTableModel(List<Issue> issues) {
