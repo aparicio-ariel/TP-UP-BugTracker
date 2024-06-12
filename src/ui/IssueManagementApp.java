@@ -1,12 +1,14 @@
 package ui;
 
 import database.DatabaseManager;
+import jdk.jshell.execution.Util;
 import model.IssueHistory;
 import model.User;
 import model.UserContext;
 import service.IssueHistoryService;
 import service.IssueService;
 import model.Issue;
+import utils.Utils;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -37,18 +39,11 @@ public class IssueManagementApp extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        add(createTitleLabel(), BorderLayout.NORTH);
         add(createSplitPane(), BorderLayout.CENTER);
 
         loadIssues();
     }
 
-    private JLabel createTitleLabel() {
-        JLabel titleLabel = new JLabel("Gestión de Incidentes");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        return titleLabel;
-    }
 
     private JSplitPane createSplitPane() {
         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
@@ -108,7 +103,7 @@ public class IssueManagementApp extends JFrame {
         gbc.gridx = 1;
         gbc.gridy = 3;
         gbc.anchor = GridBagConstraints.WEST;
-        statusComboBox = new JComboBox<>(new String[]{"Abierto", "En Progreso", "Cerrado"});
+        statusComboBox = new JComboBox<>(Utils.getStatus());
         inputPanel.add(statusComboBox, gbc);
 
         gbc.gridx = 1;
@@ -119,7 +114,7 @@ public class IssueManagementApp extends JFrame {
         inputPanel.add(addButton, gbc);
 
         // Deshabilitar los botones si el usuario no es admin
-        if (!UserContext.getInstance().getCurrentUser().getRole().equals("admin") && !UserContext.getInstance().getCurrentUser().getRole().equals("reporter")) {
+        if (!UserContext.getInstance().isAdminRole() && !UserContext.getInstance().isReporterRole()) {
             descriptionField.setEnabled(false);
             estimatedHoursField.setEnabled(false);
             actualHoursField.setEnabled(false);
@@ -151,9 +146,13 @@ public class IssueManagementApp extends JFrame {
         editButton.addActionListener(e -> editIssue());
         buttonPanel.add(editButton);
 
-        JButton deleteButton = new JButton("Cerrar Incidente");
-        deleteButton.addActionListener(e -> closeIssue());
-        buttonPanel.add(deleteButton);
+        JButton closedButton = new JButton("Cerrar Incidente");
+        closedButton.addActionListener(e -> closeIssue());
+        buttonPanel.add(closedButton);
+
+        if(!UserContext.getInstance().isAdminRole() && !UserContext.getInstance().isCloserRole()){
+            closedButton.setVisible(false);
+        }
 
         historyButton = new JButton("Ver Historial");
         historyButton.addActionListener(e -> viewHistory());
@@ -219,17 +218,17 @@ public class IssueManagementApp extends JFrame {
                 double actualHours = selectedIssue.getActualHours();
                 String status = selectedIssue.getStatus();
 
-                if (currentUser.getRole().equals("admin") || currentUser.getRole().equals("reporter")) {
+                if (UserContext.getInstance().isAdminRole() || UserContext.getInstance().isReporterRole()) {
                     String newDescription = JOptionPane.showInputDialog(this, "Ingrese la nueva descripción:", selectedIssue.getDescription());
                     if (newDescription == null) return; // Abort if Cancel is pressed
                     description = newDescription;
                 }
-                if (currentUser.getRole().equals("admin") || currentUser.getRole().equals("status_changer")) {
-                    String newStatus = (String) JOptionPane.showInputDialog(this, "Seleccione el nuevo estado:", "Estado", JOptionPane.QUESTION_MESSAGE, null, new String[]{"Abierto", "En Progreso", "Cerrado"}, selectedIssue.getStatus());
+                if (UserContext.getInstance().isAdminRole() || UserContext.getInstance().isStatusRole()) {
+                    String newStatus = (String) JOptionPane.showInputDialog(this, "Seleccione el nuevo estado:", "Estado", JOptionPane.QUESTION_MESSAGE, null, Utils.getStatus(), selectedIssue.getStatus());
                     if (newStatus == null) return; // Abort if Cancel is pressed
                     status = newStatus;
                 }
-                if (currentUser.getRole().equals("admin") || currentUser.getRole().equals("time_tracker")) {
+                if (UserContext.getInstance().isAdminRole() || UserContext.getInstance().isTimerRole()) {
                     String newEstimatedHours = JOptionPane.showInputDialog(this, "Ingrese las nuevas horas estimadas:", selectedIssue.getEstimatedHours());
                     if (newEstimatedHours == null) return; // Abort if Cancel is pressed
                     estimatedHours = Double.parseDouble(newEstimatedHours);
@@ -239,24 +238,34 @@ public class IssueManagementApp extends JFrame {
                     actualHours = Double.parseDouble(newActualHours);
                 }
 
-                selectedIssue.setDescription(description);
-                selectedIssue.setEstimatedHours(estimatedHours);
-                selectedIssue.setActualHours(actualHours);
-                selectedIssue.setStatus(status);
+                boolean changed = false;
+                if (!description.equals(oldIssue.getDescription())) {
+                    recordHistory(selectedIssue.getId(), currentUser, "Descripción", oldIssue.getDescription(), description);
+                    selectedIssue.setDescription(description);
+                    changed = true;
+                }
+                if (estimatedHours != oldIssue.getEstimatedHours()) {
+                    recordHistory(selectedIssue.getId(), currentUser, "Horas Estimadas", String.valueOf(oldIssue.getEstimatedHours()), String.valueOf(estimatedHours));
+                    selectedIssue.setEstimatedHours(estimatedHours);
+                    changed = true;
+                }
+                if (actualHours != oldIssue.getActualHours()) {
+                    recordHistory(selectedIssue.getId(), currentUser, "Horas Reales", String.valueOf(oldIssue.getActualHours()), String.valueOf(actualHours));
+                    selectedIssue.setActualHours(actualHours);
+                    changed = true;
+                }
+                if (!status.equals(oldIssue.getStatus())) {
+                    recordHistory(selectedIssue.getId(), currentUser, "Estado", oldIssue.getStatus(), status);
+                    selectedIssue.setStatus(status);
+                    changed = true;
+                }
 
-                issueService.updateIssue(selectedIssue);
-
-                // Registrar el historial de modificaciones
-                IssueHistory history = new IssueHistory();
-                history.setIssueId(selectedIssue.getId());
-                history.setUsername(currentUser.getUsername());
-                history.setDate(new Date());
-                history.setInfoBefore("Descripción: " + oldIssue.getDescription() + ", Horas Estimadas: " + oldIssue.getEstimatedHours() + ", Horas Reales: " + oldIssue.getActualHours() + ", Estado: " + oldIssue.getStatus());
-                history.setInfoAfter("Descripción: " + selectedIssue.getDescription() + ", Horas Estimadas: " + selectedIssue.getEstimatedHours() + ", Horas Reales: " + selectedIssue.getActualHours() + ", Estado: " + selectedIssue.getStatus());
-
-                new IssueHistoryService().createIssueHistory(history);
-
-                loadIssues();
+                if (changed) {
+                    issueService.updateIssue(selectedIssue);
+                    loadIssues();
+                } else {
+                    JOptionPane.showMessageDialog(this, "No se realizaron cambios.", "Información", JOptionPane.INFORMATION_MESSAGE);
+                }
             } catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(this, "Por favor ingrese números válidos para las horas estimadas y reales.", "Error de Entrada", JOptionPane.ERROR_MESSAGE);
             } catch (Exception e) {
@@ -265,17 +274,41 @@ public class IssueManagementApp extends JFrame {
         }
     }
 
+    private void recordHistory(Long issueId, User currentUser, String field, String before, String after) {
+        IssueHistory history = new IssueHistory();
+        history.setIssueId(issueId);
+        history.setUsername(currentUser.getUsername());
+        history.setDate(new Date());
+        history.setInfoBefore(field + ": " + before);
+        history.setInfoAfter(field + ": " + after);
+        new IssueHistoryService().createIssueHistory(history);
+    }
+
+
     private void closeIssue() {
         int selectedRow = issueTable.getSelectedRow();
         if (selectedRow >= 0) {
             Issue selectedIssue = issueTableModel.getIssueAt(selectedRow);
-            int confirm = JOptionPane.showConfirmDialog(this, "¿Está seguro de que desea cerrar este incidente?", "Confirmar cierre", JOptionPane.YES_NO_OPTION);
-            if (confirm == JOptionPane.YES_OPTION) {
-                issueService.closeIssue(selectedIssue.getId());
-                loadIssues();
+            if (Utils.CLOSED_STATUS.equals(selectedIssue.getStatus())) {
+                JOptionPane.showMessageDialog(this, "No es posible cerrar un proyecto en este estado", "Advertencia", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                int confirm = JOptionPane.showConfirmDialog(this, "¿Está seguro de que desea cerrar este incidente?", "Confirmar cierre", JOptionPane.YES_NO_OPTION);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    // Registrar el historial de modificaciones antes de cerrar el incidente
+                    try {
+                        User currentUser = UserContext.getInstance().getCurrentUser();
+                        recordHistory(selectedIssue.getId(), currentUser, "Estado", selectedIssue.getStatus(), Utils.CLOSED_STATUS);
+                        // Cerrar el incidente
+                        issueService.closeIssue(selectedIssue.getId());
+                        loadIssues();
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(this, "Ocurrió un error al registrar el historial de cambios o cerrar el incidente: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
             }
         }
     }
+
 
     private void closeWindow() {
         this.dispose();

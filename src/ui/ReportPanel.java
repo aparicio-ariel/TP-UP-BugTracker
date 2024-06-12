@@ -4,6 +4,7 @@ import model.ProjectReport;
 import model.DownloadFile;
 import model.UserContext;
 import service.ReportService;
+import utils.Utils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -41,7 +42,7 @@ public class ReportPanel extends JPanel {
         add(bottomPanel, BorderLayout.SOUTH);
 
         // Deshabilitar los botones si el usuario no es admin
-        if (!UserContext.getInstance().getCurrentUser().getRole().equals("admin")) {
+        if (!UserContext.getInstance().getCurrentUser().getRole().equals(Utils.ADMIN_ROLE)) {
             downloadButton.setEnabled(false);
         }
     }

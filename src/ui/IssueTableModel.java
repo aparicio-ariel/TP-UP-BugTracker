@@ -24,6 +24,11 @@ public class IssueTableModel extends AbstractTableModel {
     }
 
     @Override
+    public String getColumnName(int column) {
+        return columnNames[column];
+    }
+
+    @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         Issue issue = issues.get(rowIndex);
         switch (columnIndex) {
@@ -33,11 +38,6 @@ public class IssueTableModel extends AbstractTableModel {
             case 3: return issue.getStatus();
             default: return null;
         }
-    }
-
-    @Override
-    public String getColumnName(int column) {
-        return columnNames[column];
     }
 
     public Issue getIssueAt(int rowIndex) {

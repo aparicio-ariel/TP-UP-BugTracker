@@ -33,15 +33,27 @@ public class IssueService {
     }
 
     public void deleteIssuesByProjectId(Long projectId) {
-        String query = "DELETE FROM Issues WHERE project_id = ?";
+        String deleteIssueHistoryQuery = "DELETE FROM IssueHistory WHERE issue_id IN (SELECT id FROM Issues WHERE project_id = ?)";
+        String deleteIssuesQuery = "DELETE FROM Issues WHERE project_id = ?";
+
         try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
-            pstmt.setLong(1, projectId);
-            pstmt.executeUpdate();
+             PreparedStatement deleteHistoryStmt = conn.prepareStatement(deleteIssueHistoryQuery);
+             PreparedStatement deleteIssuesStmt = conn.prepareStatement(deleteIssuesQuery)) {
+
+            conn.setAutoCommit(false);  // Begin transaction
+
+            deleteHistoryStmt.setLong(1, projectId);
+            deleteHistoryStmt.executeUpdate();
+
+            deleteIssuesStmt.setLong(1, projectId);
+            deleteIssuesStmt.executeUpdate();
+
+            conn.commit();  // Commit transaction
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+
 
     public List<Issue> getIssuesByProjectId(Long projectId) {
         List<Issue> issues = new ArrayList<>();
@@ -113,7 +125,7 @@ public class IssueService {
     }
 
     public void closeIssue(Long issueId) {
-        String query = "UPDATE Issues SET status = 'Closed' WHERE id = ?";
+        String query = "UPDATE Issues SET status = 'Cerrado' WHERE id = ?";
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setLong(1, issueId);

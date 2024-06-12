@@ -61,7 +61,7 @@ public class LoginScreen extends JFrame {
     }
 
     private JLabel createTitleLabel() {
-        JLabel titleLabel = new JLabel("Inicio de Sesión del Rastreador de Incidentes");
+        JLabel titleLabel = new JLabel("Login - BugTracker");
         titleLabel.setFont(TITLE_FONT);
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         return titleLabel;
@@ -107,7 +107,7 @@ public class LoginScreen extends JFrame {
     }
 
     private JLabel createFooterLabel() {
-        JLabel footerLabel = new JLabel("© 2024 Rastreador de Incidentes");
+        JLabel footerLabel = new JLabel("© 2024 TP - Laboratorio III");
         footerLabel.setFont(FOOTER_FONT);
         footerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         return footerLabel;
