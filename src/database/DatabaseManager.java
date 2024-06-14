@@ -54,8 +54,8 @@ public class DatabaseManager {
                     ")";
             stmt.execute(createIssuesHistoryTable);
 
-
             System.out.println("Tables created successfully");
+
         } catch (SQLException e) {
             e.printStackTrace();
         }

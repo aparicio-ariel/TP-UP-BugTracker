@@ -138,10 +138,4 @@ public class LoginScreen extends JFrame {
         passwordField.setText("");
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            DatabaseManager.createTables();
-            new LoginScreen().setVisible(true);
-        });
-    }
 }

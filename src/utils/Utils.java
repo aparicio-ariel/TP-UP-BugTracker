@@ -1,10 +1,5 @@
 package utils;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.Arrays;
-import java.util.List;
-
 public class Utils {
     public static final String ADMIN_ROLE = "admin";
     public static final String REPORTER_ROLE = "reporter";
