@@ -192,6 +192,10 @@ public class IssueManagementApp extends JFrame {
             issue.setStatus(status);
 
             issueService.createIssue(issue);
+            descriptionField.setText("");
+            estimatedHoursField.setText("");
+            actualHoursField.setText("");
+
             loadIssues();
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "Por favor ingrese números válidos para las horas estimadas y reales.", "Error de Entrada", JOptionPane.ERROR_MESSAGE);

@@ -72,6 +72,8 @@ public class UserManagementApp extends JFrame {
 
         try {
             userService.createUser(user);
+            usernameField.setText("");
+            passwordField.setText("");
             loadUsers();
         } catch (Exception e) {
             if (e.getMessage().contains("Unique index or primary key violation")) {
@@ -162,6 +164,8 @@ public class UserManagementApp extends JFrame {
 
         try {
             projectService.createProject(project);
+            projectNameField.setText("");
+            projectDescriptionArea.setText("");
             loadProjects();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Ocurrió un error al agregar el proyecto: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
