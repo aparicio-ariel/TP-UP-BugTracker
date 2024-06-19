@@ -3,9 +3,9 @@ package ui;
 import model.IssueHistory;
 import model.UserContext;
 import service.IssueHistoryService;
-import service.IssueService;
+import service.IssueServiceImpl;
 import service.ProjectService;
-import service.UserService;
+import service.UserServiceImpl;
 import model.Project;
 import model.User;
 import utils.Utils;
@@ -15,9 +15,9 @@ import java.awt.*;
 import java.util.List;
 
 public class UserManagementApp extends JFrame {
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
     private ProjectService projectService;
-    private IssueService issueService;
+    private IssueServiceImpl issueServiceImpl;
     private JTextField usernameField;
     private JPasswordField passwordField;
     private JComboBox<String> roleComboBox;
@@ -27,9 +27,9 @@ public class UserManagementApp extends JFrame {
     private JList<Project> projectList;
 
     public UserManagementApp() {
-        userService = new UserService();
+        userServiceImpl = new UserServiceImpl();
         projectService = new ProjectService();
-        issueService = new IssueService();
+        issueServiceImpl = new IssueServiceImpl();
 
         setTitle("Panel principal");
         setSize(1000, 800);
@@ -71,7 +71,7 @@ public class UserManagementApp extends JFrame {
         user.setRole(role);
 
         try {
-            userService.createUser(user);
+            userServiceImpl.createUser(user);
             usernameField.setText("");
             passwordField.setText("");
             loadUsers();
@@ -109,7 +109,7 @@ public class UserManagementApp extends JFrame {
                 selectedUser.setUsername(username);
                 selectedUser.setPassword(password);
                 selectedUser.setRole(role);
-                userService.updateUser(selectedUser);
+                userServiceImpl.updateUser(selectedUser);
                 loadUsers();
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, "Ocurrió un error al editar el usuario: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -123,7 +123,7 @@ public class UserManagementApp extends JFrame {
             int confirm = JOptionPane.showConfirmDialog(this, "¿Está seguro de que desea eliminar este usuario?", "Confirmar Eliminación", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
                 try {
-                    userService.deleteUser(selectedUser.getId());
+                    userServiceImpl.deleteUser(selectedUser.getId());
                     loadUsers();
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(this, "Ocurrió un error al eliminar el usuario: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -135,7 +135,7 @@ public class UserManagementApp extends JFrame {
 
     private void loadUsers() {
         if (UserContext.getInstance().isAdminRole()) {
-            List<User> users = userService.getAllUsers();
+            List<User> users = userServiceImpl.getAllUsers();
             DefaultListModel<User> model = new DefaultListModel<>();
             for (User user : users) {
                 model.addElement(user);
@@ -206,7 +206,7 @@ public class UserManagementApp extends JFrame {
             int confirm = JOptionPane.showConfirmDialog(this, "¿Está seguro de que desea eliminar este proyecto?", "Confirmar Eliminación", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
                 try {
-                    issueService.deleteIssuesByProjectId(selectedProject.getId()); // Eliminar problemas y su historial asociados
+                    issueServiceImpl.deleteIssuesByProjectId(selectedProject.getId()); // Eliminar problemas y su historial asociados
                     projectService.deleteProject(selectedProject.getId());
                     loadProjects();
                 } catch (Exception e) {

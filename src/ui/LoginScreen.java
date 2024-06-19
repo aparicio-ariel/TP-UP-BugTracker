@@ -1,18 +1,15 @@
 package ui;
 
-import database.DatabaseManager;
 import model.UserContext;
-import service.UserService;
+import service.UserServiceImpl;
 import model.User;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class LoginScreen extends JFrame {
 
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
     private JTextField usernameField;
     private JPasswordField passwordField;
 
@@ -22,7 +19,7 @@ public class LoginScreen extends JFrame {
     private static final Dimension RIGID_AREA_DIMENSION = new Dimension(0, 20);
 
     public LoginScreen() {
-        userService = new UserService();
+        userServiceImpl = new UserServiceImpl();
         setTitle("Inicio de Sesión");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -122,7 +119,7 @@ public class LoginScreen extends JFrame {
             return;
         }
 
-        User user = userService.getUserByUsernameAndPassword(username, password);
+        User user = userServiceImpl.getUserByUsernameAndPassword(username, password);
         if (user != null) {
             UserContext.getInstance().setCurrentUser(user);
             new UserManagementApp().setVisible(true);

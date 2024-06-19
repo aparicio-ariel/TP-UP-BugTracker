@@ -1,14 +1,16 @@
 package service;
 
 import database.DatabaseManager;
+import interfaces.UserService;
 import model.User;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserService {
+public class UserServiceImpl implements UserService {
 
+    @Override
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
         String query = "SELECT * FROM Users";
@@ -30,6 +32,7 @@ public class UserService {
         return users;
     }
 
+    @Override
     public void createUser(User user) {
         String query = "INSERT INTO Users (username, password, role) VALUES (?, ?, ?)";
         try (Connection conn = DatabaseManager.getConnection();
@@ -44,6 +47,7 @@ public class UserService {
         }
     }
 
+    @Override
     public void updateUser(User user) {
         String query = "UPDATE Users SET username = ?, password = ?, role = ? WHERE id = ?";
         try (Connection conn = DatabaseManager.getConnection();
@@ -59,6 +63,7 @@ public class UserService {
         }
     }
 
+    @Override
     public void deleteUser(Long userId) {
         String query = "DELETE FROM Users WHERE id = ?";
         try (Connection conn = DatabaseManager.getConnection();
@@ -71,6 +76,7 @@ public class UserService {
         }
     }
 
+    @Override
     public User getUserByUsernameAndPassword(String username, String password) {
         String query = "SELECT * FROM Users WHERE username = ? AND password = ?";
         try (Connection conn = DatabaseManager.getConnection();

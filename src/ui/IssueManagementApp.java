@@ -1,12 +1,11 @@
 package ui;
 
 import database.DatabaseManager;
-import jdk.jshell.execution.Util;
 import model.IssueHistory;
 import model.User;
 import model.UserContext;
 import service.IssueHistoryService;
-import service.IssueService;
+import service.IssueServiceImpl;
 import model.Issue;
 import utils.Utils;
 
@@ -19,7 +18,7 @@ import java.util.List;
 
 public class IssueManagementApp extends JFrame {
 
-    private IssueService issueService;
+    private IssueServiceImpl issueServiceImpl;
     private JTextField descriptionField;
     private JTextField estimatedHoursField;
     private JTextField actualHoursField;
@@ -31,7 +30,7 @@ public class IssueManagementApp extends JFrame {
 
     public IssueManagementApp(Long projectId) {
         this.projectId = projectId;
-        issueService = new IssueService();
+        issueServiceImpl = new IssueServiceImpl();
 
         setTitle("Gestión de Incidentes");
         setSize(800, 600);
@@ -129,7 +128,7 @@ public class IssueManagementApp extends JFrame {
         JPanel tablePanel = new JPanel(new BorderLayout());
         tablePanel.setBorder(BorderFactory.createTitledBorder("Lista de Incidentes"));
 
-        issueTableModel = new IssueTableModel(issueService.getIssuesByProjectId(projectId));
+        issueTableModel = new IssueTableModel(issueServiceImpl.getIssuesByProjectId(projectId));
         issueTable = new JTable(issueTableModel);
         JScrollPane scrollPane = new JScrollPane(issueTable);
         tablePanel.add(scrollPane, BorderLayout.CENTER);
@@ -191,7 +190,7 @@ public class IssueManagementApp extends JFrame {
             issue.setActualHours(actualHours);
             issue.setStatus(status);
 
-            issueService.createIssue(issue);
+            issueServiceImpl.createIssue(issue);
             descriptionField.setText("");
             estimatedHoursField.setText("");
             actualHoursField.setText("");
@@ -265,7 +264,7 @@ public class IssueManagementApp extends JFrame {
                 }
 
                 if (changed) {
-                    issueService.updateIssue(selectedIssue);
+                    issueServiceImpl.updateIssue(selectedIssue);
                     loadIssues();
                 } else {
                     JOptionPane.showMessageDialog(this, "No se realizaron cambios.", "Información", JOptionPane.INFORMATION_MESSAGE);
@@ -303,7 +302,7 @@ public class IssueManagementApp extends JFrame {
                         User currentUser = UserContext.getInstance().getCurrentUser();
                         recordHistory(selectedIssue.getId(), currentUser, "Estado", selectedIssue.getStatus(), Utils.CLOSED_STATUS);
                         // Cerrar el incidente
-                        issueService.closeIssue(selectedIssue.getId());
+                        issueServiceImpl.closeIssue(selectedIssue.getId());
                         loadIssues();
                     } catch (Exception e) {
                         JOptionPane.showMessageDialog(this, "Ocurrió un error al registrar el historial de cambios o cerrar el incidente: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -319,7 +318,7 @@ public class IssueManagementApp extends JFrame {
     }
 
     private void loadIssues() {
-        List<Issue> issues = issueService.getIssuesByProjectId(projectId);
+        List<Issue> issues = issueServiceImpl.getIssuesByProjectId(projectId);
         issueTableModel.setIssues(issues);
         updateHistoryButtonState();
     }

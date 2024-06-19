@@ -1,14 +1,16 @@
 package service;
 
 import database.DatabaseManager;
+import interfaces.IssueService;
 import model.Issue;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IssueService {
+public class IssueServiceImpl implements IssueService {
 
+    @Override
     public List<Issue> getAllIssues() {
         List<Issue> issues = new ArrayList<>();
         String query = "SELECT * FROM Issues";
@@ -32,6 +34,7 @@ public class IssueService {
         return issues;
     }
 
+    @Override
     public void deleteIssuesByProjectId(Long projectId) {
         String deleteIssueHistoryQuery = "DELETE FROM IssueHistory WHERE issue_id IN (SELECT id FROM Issues WHERE project_id = ?)";
         String deleteIssuesQuery = "DELETE FROM Issues WHERE project_id = ?";
@@ -55,6 +58,7 @@ public class IssueService {
     }
 
 
+    @Override
     public List<Issue> getIssuesByProjectId(Long projectId) {
         List<Issue> issues = new ArrayList<>();
         String query = "SELECT * FROM Issues WHERE project_id = ?";
@@ -80,6 +84,7 @@ public class IssueService {
         return issues;
     }
 
+    @Override
     public void createIssue(Issue issue) {
         String query = "INSERT INTO Issues (project_id, description, estimated_hours, actual_hours, status) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseManager.getConnection();
@@ -96,6 +101,7 @@ public class IssueService {
         }
     }
 
+    @Override
     public void updateIssue(Issue issue) {
         String query = "UPDATE Issues SET description = ?, estimated_hours = ?, actual_hours = ?, status = ? WHERE id = ?";
         try (Connection conn = DatabaseManager.getConnection();
@@ -112,6 +118,7 @@ public class IssueService {
         }
     }
 
+    @Override
     public void deleteIssue(Long issueId) {
         String query = "DELETE FROM Issues WHERE id = ?";
         try (Connection conn = DatabaseManager.getConnection();
@@ -124,6 +131,7 @@ public class IssueService {
         }
     }
 
+    @Override
     public void closeIssue(Long issueId) {
         String query = "UPDATE Issues SET status = 'Cerrado' WHERE id = ?";
         try (Connection conn = DatabaseManager.getConnection();
